@@ -1,0 +1,32 @@
+{
+    "name": "meraki/html",
+    "type": "library",
+    "require-dev": {
+        "meraki/test-suite": "^0.3.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Meraki\\Html\\": "src/"
+        }
+    },
+	"autoload-dev": {
+		"psr-4": {
+			"Meraki\\Html\\": "tests/"
+		}
+	},
+    "authors": [
+        {
+            "name": "Nathan",
+            "email": "nbish11@hotmail.com"
+        }
+    ],
+    "require": {
+        "brick/date-time": "^0.7.0",
+        "ramsey/uuid": "^4.7",
+        "phpseclib/bcmath_compat": "^2.0"
+    },
+	"scripts": {
+		"test": "phpunit"
+	}
+}
