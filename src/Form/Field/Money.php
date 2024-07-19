@@ -50,11 +50,10 @@ final class Money extends Field
 			$precision = new Attribute\Precision($this->getPrecision($max->value));
 		}
 
-		// @todo: some times the browser will chop off trailing zeros (e.g. send "0.3" instead of "0.30")
+		// some times the browser will chop off trailing zeros (e.g. send "0.3" instead of "0.30")
 		// even if step is set correctly (e.g. "0.01" requires 2 decimal places). This is a problem with
-		// the browser, not neccessarily the user input. The server should be able to handle this case by
-		// converting trailing zeros to the correct number of decimal places.
-
+		// the browser, not neccessarily the user input. To remedy this, the value is allowed to be
+		// padded to the correct precision.
 		if ($precision !== null) {
 			$value = $this->padPrecision($value, $precision->value);
 

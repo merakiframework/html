@@ -57,6 +57,9 @@ class FieldRenderer
 		$fieldAttrs->add(new Attribute\Data($type->name, $type->value));
 		$fieldAttrs->remove($label);
 
+		// @bug: Adding any attributes to the field element from any of the render*
+		// methods will not work. The attributes are rendered before the render* methods
+		// are called.
 		$str = '<' . $field->tagName . (string)$fieldAttrs . '>';
 		$str .= $this->renderLabelElement($label, $idForInput);
 		$str .= $this->renderInputElement($inputAttrs, $field);
@@ -180,50 +183,6 @@ class FieldRenderer
 		};
 	}
 
-	private function renderTextInput(Attribute\Set $inputAttrs, Field\Text $field): string
-	{
-		// textarea input for multiline...
-		if ($field->attributes->find(Attribute\Multiline::class) !== null) {
-			$value = $inputAttrs->find(Attribute\Value::class);
-			$inputAttrs->remove(Attribute\Type::class, Attribute\Value::class);
-			$input = new Element('textarea', $inputAttrs);
-			if ($value !== null) {
-				$input->setContent($value->value);
-			}
-		} else {
-			$input = new Element('input', $inputAttrs);
-		}
-
-		// $fieldType = $field->type->value;
-		// $input->addAttributes([
-		// 	'name' => $field->name,
-		// 	'placeholder' => $field->placeholder ?? '',
-		// ]);
-
-		// foreach ($field->attributes as $attr) {
-		// 	// these constraints do not have equivalent HTML attributes
-		// 	if (in_array($attr->name, ['unique', 'version', 'multiline', 'policy'])) {
-		// 		continue;
-		// 	}
-
-			// $input->setAttribute($name, $value);
-		// }
-
-		// if (isset($field->autocomplete)) {
-		// 	$input->setAttribute('autocomplete', $field->autocomplete);
-		// }
-
-		// $hasValue =
-
-		// if ($hasValue && $input->tagName === 'textarea') {
-		// 	$input->setContent($field->value);
-		// } elseif ($hasValue && $type !== 'password') {
-		// 	$input->setAttribute('value', $field->value);
-		// }
-
-		return (new Renderer())->render($input);
-	}
-
 	private function renderBooleanInput(Attribute\Set $inputAttrs, Field\Boolean $field): string
 	{
 		$inputAttrs->replace(new Attribute\Type('checkbox'));
@@ -240,6 +199,8 @@ class FieldRenderer
 		if ($value !== null && is_bool($value->value)) {
 			$input->attributes->remove($value);
 		}
+
+		// @todo: implement a way to choose checkbox or switch
 
 		return (new Renderer())->render($input);
 	}
@@ -318,7 +279,156 @@ class FieldRenderer
 			$input->attributes->add(new Attribute\Step($step));
 		}
 
+		$precision = $field->attributes->find(Attribute\Precision::class);
+
+		// remove precision from input as it's not a valid attribute
+		// @bug: adding a data-precision attribute to the field element still adds it to the
+		// input element, but it should not be there.
+		$input->attributes->remove(Attribute\Precision::class);
+
+		// @todo: implement currency symbol
+
 		return (new Renderer())->render($input);
+	}
+
+	private function renderNameInput(Attribute\Set $inputAttrs, Field\Name $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('text'));
+		$input = new Element('input', $inputAttrs);
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderNumberInput(Attribute\Set $inputAttrs, Field\Number $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('number'));
+		$input = new Element('input', $inputAttrs);
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderPassphraseInput(Attribute\Set $inputAttrs, Field\Passphrase $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('password'));
+		$input = new Element('input', $inputAttrs);
+
+		// @todo implement password strength meter
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderPasswordInput(Attribute\Set $inputAttrs, Field\Password $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('password'));
+		$input = new Element('input', $inputAttrs);
+
+		// @todo: implement a criteria checker (lists password policies,
+		// then gives ticks/crosses if met), rather than error messages.
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderPhoneNumberInput(Attribute\Set $inputAttrs, Field\PhoneNumber $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('tel'));
+		$input = new Element('input', $inputAttrs);
+
+		// @todo: implement an international prefix selector
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderTextInput(Attribute\Set $inputAttrs, Field\Text $field): string
+	{
+		// textarea input for multiline...
+		if ($field->attributes->find(Attribute\Multiline::class) !== null) {
+			$value = $inputAttrs->find(Attribute\Value::class);
+			$inputAttrs->remove(Attribute\Type::class, Attribute\Value::class);
+			$input = new Element('textarea', $inputAttrs);
+			if ($value !== null) {
+				$input->setContent($value->value);
+			}
+		} else {
+			$input = new Element('input', $inputAttrs);
+		}
+
+		// $fieldType = $field->type->value;
+		// $input->addAttributes([
+		// 	'name' => $field->name,
+		// 	'placeholder' => $field->placeholder ?? '',
+		// ]);
+
+		// foreach ($field->attributes as $attr) {
+		// 	// these constraints do not have equivalent HTML attributes
+		// 	if (in_array($attr->name, ['unique', 'version', 'multiline', 'policy'])) {
+		// 		continue;
+		// 	}
+
+		// $input->setAttribute($name, $value);
+		// }
+
+		// if (isset($field->autocomplete)) {
+		// 	$input->setAttribute('autocomplete', $field->autocomplete);
+		// }
+
+		// $hasValue =
+
+		// if ($hasValue && $input->tagName === 'textarea') {
+		// 	$input->setContent($field->value);
+		// } elseif ($hasValue && $type !== 'password') {
+		// 	$input->setAttribute('value', $field->value);
+		// }
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderTimeInput(Attribute\Set $inputAttrs, Field\Time $field): string
+	{
+		$input = new Element('input', $inputAttrs);
+
+		// @todo: implement custom time picker
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderUrlInput(Attribute\Set $inputAttrs, Field\Url $field): string
+	{
+		$inputAttrs->replace(new Attribute\Type('url'));
+		$input = new Element('input', $inputAttrs);
+
+		return (new Renderer())->render($input);
+	}
+
+	private function renderUuidInput(Attribute\Set $inputAttrs, Field\Uuid $field): string
+	{
+		$version = $field->attributes->findOrCreate(Attribute\Version::class, fn() => Attribute\Version::any());
+		$pattern = $this->getPatternForVersion($version->value);
+		$inputAttrs->allow(Attribute\Pattern::class);	// allow pattern attribute for rendering
+		$inputAttrs->add(new Attribute\Pattern($pattern));
+		$inputAttrs->replace(new Attribute\Type('text'));
+		$input = new Element('input', $inputAttrs);
+
+		$input->attributes->remove(Attribute\Version::class);	// not a valid HTML attribute
+
+		return (new Renderer())->render($input);
+	}
+
+	private function getPatternForVersion(int|string $version): string
+	{
+		return match ($version) {
+			1, '1' => '^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			2, '2' => '^[0-9a-f]{8}-[0-9a-f]{4}-2[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			3, '3' => '^[0-9a-f]{8}-[0-9a-f]{4}-3[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			4, '4' => '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			5, '5' => '^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			6, '6' => '^[0-9a-f]{8}-[0-9a-f]{4}-6[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			7, '7' => '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			8, '8' => '^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			'any' => '^[0-9a-f]{8}-[0-9a-f]{4}-\d[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+			default => throw new \InvalidArgumentException(
+				'Unknown UUID version: ' . $version
+			)
+		};
 	}
 
 	private static function buildInputElementForEnum($schema): Element

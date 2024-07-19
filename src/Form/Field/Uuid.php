@@ -16,7 +16,9 @@ final class Uuid extends Field
 
 	public function getDefaultAttributes(): array
 	{
-		return [];
+		return [
+			Attribute\Version::any(),
+		];
 	}
 
 	public function getType(): Attribute\Type
@@ -38,7 +40,7 @@ final class Uuid extends Field
 				return ValidationResult::failed($value, "A version {$version->value} UUID is required: Version {$value->getVersion()} UUID provided.");
 			}
 		} catch (UuidExceptionInterface $e) {
-			return ValidationResult::failed($value, 'UUID is not valid.');
+			return ValidationResult::failed($value, 'Invalid UUID format: '.$e->getMessage());
 		}
 
 		return ValidationResult::success($value);
