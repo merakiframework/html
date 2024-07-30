@@ -13,6 +13,22 @@ final class Action extends Attribute
 		$this->setValue($value);
 	}
 
+	/**
+	 * Expand the value of the attribute with the given placeholders.
+	 */
+	public function expand(array $placeholders): self
+	{
+		$value = $this->value;
+
+		foreach ($placeholders as $placeholderName => $placeholderValue) {
+			$value = str_replace('{' . $placeholderName . '}', $placeholderValue, $value);
+		}
+
+		$this->setValue($value);
+
+		return $this;
+	}
+
 	protected function setValue(mixed $value): void
 	{
 		$value = trim($value);

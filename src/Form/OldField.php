@@ -71,7 +71,7 @@ class OldField extends Element
 			throw new \InvalidArgumentException('Label and input must have the same id');
 		}
 
-		$this->appendAllContent($label, $input, $messages);
+		$this->appendContent($label, $input, $messages);
 	}
 
 	public static function createFromSchema($schema): self

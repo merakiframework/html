@@ -7,9 +7,8 @@ use Meraki\Html\Attribute;
 
 final class Novalidate extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		$this->setName('novalidate');
-		$this->setValue('');
+		parent::__construct('novalidate', $value);
 	}
 }

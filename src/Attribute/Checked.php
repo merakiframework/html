@@ -7,9 +7,8 @@ use Meraki\Html\Attribute;
 
 final class Checked extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		$this->setName('checked');
-		$this->setValue('');
+		parent::__construct('checked', $value);
 	}
 }

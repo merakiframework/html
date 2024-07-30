@@ -4,14 +4,10 @@ declare(strict_types=1);
 namespace Meraki\Html;
 use Meraki\Html\Attribute\Boolean;
 
-/**
- * @property-read string $name
- * @property-read int|\Stringable|bool|string|null $value
- */
 class Attribute
 {
 	public string $name;
-	public int|\Stringable|bool|string $value;
+	public int|\Stringable|bool|string|null $value;
 
 	public function __construct(string $name, int|\Stringable|bool|string|null $value)
 	{

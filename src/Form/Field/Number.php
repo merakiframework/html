@@ -74,6 +74,12 @@ final class Number extends Field
 		$step = $this->attributes->find(Attribute\Step::class);
 		$precision = $this->attributes->find(Attribute\Precision::class);
 
+		// get precision from step if precision attribute not set
+		// @todo: if you can set precision from step, then is precision attribute even needed?
+		if ($step !== null && $precision === null  && strpos($step->value, '.') !== false) {
+			$precision = new Attribute\Precision(strlen(substr(strrchr($step->value, "."), 1)));
+		}
+
 		// check length constraints
 		if ($min !== null && bccomp($value, $min->value) === -1) {
 			$paddedValue = $this->padToPrecision($min->value, $precision);
@@ -116,6 +122,28 @@ final class Number extends Field
 		$modulus = bcmod($value, $step, 10);
 
 		return bccomp($modulus, '0', 10) === 0;
+	}
+
+	public function restrictRange(int|float $min, int|float $max): self
+	{
+		$this->attributes->set(new Attribute\Min($min));
+		$this->attributes->set(new Attribute\Max($max));
+
+		return $this;
+	}
+
+	public function stepInIncrementsOf(int|float|string $step): self
+	{
+		$this->attributes->set(new Attribute\Step((string)$step));
+
+		return $this;
+	}
+
+	public function requirePrecisionOf(int $precision): self
+	{
+		$this->attributes->set(new Attribute\Precision($precision));
+
+		return $this;
 	}
 
 	private function padToPrecision(string $value, ?Attribute\Precision $precision): string

@@ -30,6 +30,7 @@ final class PhoneNumber extends Field
 		Attribute\Min::class,
 		Attribute\Max::class,
 		Attribute\Pattern::class,
+		Attribute\Placeholder::class,
 	];
 
 	public function getType(): Attribute\Type

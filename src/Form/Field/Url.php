@@ -12,6 +12,7 @@ final class Url extends Field
 		Attribute\Min::class,	// URLs must have at least 1 character
 		Attribute\Max::class,	// URLs must be less than 2048 characters
 		Attribute\Type::class,	// 'absolute', 'relative', or 'any'
+		Attribute\Placeholder::class,
 	];
 
 	public function getType(): Attribute\Type

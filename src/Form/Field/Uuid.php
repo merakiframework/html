@@ -12,6 +12,7 @@ final class Uuid extends Field
 {
 	public static array $allowedAttributes = [
 		Attribute\Version::class,	// 'any', 1, 2, 3, 4, 5, 6, 7, or 8
+		Attribute\Placeholder::class,
 	];
 
 	public function getDefaultAttributes(): array

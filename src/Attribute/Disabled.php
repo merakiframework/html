@@ -7,9 +7,8 @@ use Meraki\Html\Attribute;
 
 final class Disabled extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		$this->setName('disabled');
-		$this->setValue('');
+		parent::__construct('disabled', $value);
 	}
 }

@@ -14,6 +14,68 @@ final class Set implements \Countable, \IteratorAggregate
 		array_map([$this, 'add'], $fields);
 	}
 
+	public static function createFromArrayList(array $fields): self
+	{
+		return new self(...$fields);
+	}
+
+	public static function tryCreateFromArrayList(array $fields): ?self
+	{
+		if (self::isArrayListInstancesOfField($fields)) {
+			return new self(...$fields);
+		}
+
+		return null;
+	}
+
+	private static function isArrayListInstancesOfField(array $fields): bool
+	{
+		if (empty($fields) || !array_is_list($fields)) {
+			return false;
+		}
+
+		foreach ($fields as $field) {
+			if (!$field instanceof Field) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static function createFromSchema(array $schema, ?Factory $factory = null): self
+	{
+		if (is_array($schema) && !array_is_list($schema)) {
+			throw new \InvalidArgumentException('Schema must be a list of field schemas.');
+		}
+
+		$self = new self();
+
+		foreach ($schema as $fieldSchema) {
+			if (is_object($fieldSchema) || (is_array($fieldSchema) && !array_is_list($fieldSchema))) {
+				$fieldSchema = (object) $fieldSchema;
+
+				// look for field type
+				if (!isset($fieldSchema->type)) {
+					throw new \InvalidArgumentException('Field schema must have a "type".');
+				}
+
+				$type = $fieldSchema->type;
+
+				if (class_exists($type)) {
+					$self->add($type::createFromSchema($fieldSchema));
+					continue;
+				}
+
+				throw new \InvalidArgumentException('Field type "' . $type . '" does not exist.');
+			}
+
+			throw new \InvalidArgumentException('Field schema must be an key=>value array or an object.');
+		}
+
+		return $self;
+	}
+
 	public function map(callable $callback): self
 	{
 		return new self(...array_map($callback, $this->fields));
@@ -84,9 +146,23 @@ final class Set implements \Countable, \IteratorAggregate
 
 	public function add(Field $field): void
 	{
-		$this->remove($field); // ensure no duplicates (attributes are unique by name
+		$this->remove($field); // ensure no duplicates (attributes are unique by name)
 
 		$this->fields[] = $field;
+	}
+
+	/**
+	 * Check if all fields pass a given test.
+	 */
+	public function every(callable $callback): bool
+	{
+		foreach ($this->fields as $field) {
+			if (!$callback($field)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public function exists(Field $field): bool
@@ -106,7 +182,7 @@ final class Set implements \Countable, \IteratorAggregate
 	public function indexOf(Field $field): ?int
 	{
 		foreach ($this->fields as $index => $existingField) {
-			if (strcasecmp($existingField->name, $field->name) === 0) {
+			if ($field->name->equals($existingField->name)) {
 				return $index;
 			}
 		}

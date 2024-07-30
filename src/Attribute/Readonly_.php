@@ -7,9 +7,8 @@ use Meraki\Html\Attribute;
 
 final class Readonly_ extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		$this->setName('readonly');
-		$this->setValue('');
+		parent::__construct('readonly', $value);
 	}
 }

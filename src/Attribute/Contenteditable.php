@@ -11,8 +11,8 @@ use Meraki\Html\Attribute\Boolean;
  */
 final class Contenteditable extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		parent::__construct('contenteditable', true);
+		parent::__construct('contenteditable', $value);
 	}
 }

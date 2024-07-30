@@ -7,9 +7,8 @@ use Meraki\Html\Attribute;
 
 final class Selected extends Attribute implements Boolean
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		$this->setName('selected');
-		$this->setValue('');
+		parent::__construct('selected', $value);
 	}
 }

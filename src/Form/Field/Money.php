@@ -16,6 +16,11 @@ final class Money extends Field
 		Attribute\Step::class,
 	];
 
+	public static array $requiredAttributes = [
+		Attribute\Precision::class,
+		Attribute\Currency::class,
+	];
+
 	public function getType(): Attribute\Type
 	{
 		return new Attribute\Type('money');

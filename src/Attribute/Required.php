@@ -19,8 +19,8 @@ use Meraki\Html\Form\Field\ValidationResult;
  */
 final class Required extends Attribute implements Boolean, Constraint
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		parent::__construct('required', true);
+		parent::__construct('required', $value);
 	}
 }

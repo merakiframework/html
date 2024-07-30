@@ -13,6 +13,7 @@ final class Time extends Field
 	public static array $allowedAttributes = [
 		Attribute\Min::class,	// min time accepted in ISO 8601 format
 		Attribute\Max::class,	// max time accepted in ISO 8601 format
+		Attribute\Availability::class,	// @todo: implement this
 	];
 
 	public function getType(): Attribute\Type

@@ -16,6 +16,7 @@ final class Date extends Field
 		Attribute\Max::class,
 		Attribute\Step::class,
 		Attribute\FirstDayOfWeek::class,
+		Attribute\Availability::class,	// @todo: implement this
 	];
 
 	public function getType(): Attribute\Type

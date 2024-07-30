@@ -97,25 +97,25 @@ class Element
 		return $this;
 	}
 
-	public function appendContent(string|self $node): self
+	// public function appendContent(string|self $node): self
+	// {
+	// 	$this->checkTagCanHaveContent();
+
+	// 	$this->children[] = $node;
+
+	// 	if ($node instanceof self) {
+	// 		$node->setParent($this);
+	// 		return $node;
+	// 	}
+
+	// 	return $this;
+	// }
+
+	public function appendContent(string|self ...$nodes): self
 	{
 		$this->checkTagCanHaveContent();
 
-		$this->children[] = $node;
-
-		if ($node instanceof self) {
-			$node->setParent($this);
-			return $node;
-		}
-
-		return $this;
-	}
-
-	public function appendAllContent(string|self ...$nodes): self
-	{
-		$this->checkTagCanHaveContent();
-
-		$this->children = [...$this->children, ...$nodes];
+		$this->children = $this->content = [...$this->children, ...$nodes];
 
 		foreach ($nodes as $node) {
 			if ($node instanceof self) {

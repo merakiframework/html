@@ -17,7 +17,9 @@ use Meraki\Html\Attribute;
  * 	- each "word" must be at least one character long
  *  - be at most 255 characters long
  *  - be at least 1 character long
- *  - Use Roman Numerals to represent numbers (e.g. John Doe IV)
+ *  - should use Roman Numerals to represent numbers (e.g. John Doe IV)
+ *
+ * You can of course override these restrictions by setting the appropriate attributes.
  *
  * @see https://www.w3.org/International/questions/qa-personal-names
  * @see https://shinesolutions.com/2018/01/08/falsehoods-programmers-believe-about-names-with-examples/
@@ -34,8 +36,11 @@ final class Name extends Field
 
 	public static array $allowedAttributes = [
 		Attribute\Pattern::class,
-		Attribute\Min::class,		// measured in characters
-		Attribute\Max::class,		// measured in characters
+		Attribute\Min::class,			// measured in characters
+		Attribute\Max::class,			// measured in characters
+		Attribute\Placeholder::class,
+		Attribute\Href::class,			// for linking a field value
+		Attribute\Content::class,		// for linking a field value
 	];
 
 	public function getType(): Attribute\Type
@@ -46,7 +51,7 @@ final class Name extends Field
 	public function validate(mixed $value): ValidationResult
 	{
 		if (!is_string($value)) {
-			return ValidationResult::failed($value, 'Value is not a valid name.');
+			return ValidationResult::failed($value, 'A name must be a string.');
 		}
 
 		$errors = [];

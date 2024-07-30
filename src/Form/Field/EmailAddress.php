@@ -28,6 +28,7 @@ final class EmailAddress extends Field
 		Attribute\Pattern::class,
 		Attribute\Min::class,
 		Attribute\Max::class,
+		Attribute\Placeholder::class,
 	];
 
 	public function getDefaultAttributes(): array

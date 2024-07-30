@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace Meraki\Html;
+use Meraki\Html\Form\Field;
 
 class Renderer
 {
@@ -12,10 +13,18 @@ class Renderer
 
 	public function render(Element $element): string
 	{
+		if ($element instanceof Field) {
+			return (new FieldRenderer())->render($element);
+		}
+
 		$str = '<' . $element->tagName . (string)$element->attributes . '>';
 
 		if (!$element->isSelfClosing()) {
-			$str .= $this->buildContent($element->children);
+			if ($element instanceof Form) {
+				$str .= $this->buildFormContent($element);
+			} else {
+				$str .= $this->buildContent($element->children);
+			}
 			$str .= '</' . $element->tagName . '>';
 		}
 

@@ -10,8 +10,8 @@ use Meraki\Html\Form\Field;
 
 final class Multiline extends Attribute implements Boolean, Constraint
 {
-	public function __construct()
+	public function __construct(bool $value = true)
 	{
-		parent::__construct('multiline', true);
+		parent::__construct('multiline', $value);
 	}
 }

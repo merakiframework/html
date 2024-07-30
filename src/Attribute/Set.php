@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Meraki\Html\Attribute;
 
-use Exception;
 use Meraki\Html\Attribute;
 use Meraki\Html\Exception\AttributesNotAllowed;
 use Meraki\Html\Form\Field\Constraint;
+use Exception;
 
 class Set implements \Countable, \IteratorAggregate
 {
@@ -32,6 +32,46 @@ class Set implements \Countable, \IteratorAggregate
 		if (count($allowed) > 0) {
 			$this->allow(...$allowed);
 		}
+	}
+
+	/**
+	 * Looks for an attribute in the set and returns it if found while also
+	 * removing it from the set.
+	 */
+	public function removeAndReturn(string|Attribute $attribute): ?Attribute
+	{
+		$index = $this->indexOf($attribute);
+
+		if ($index !== null) {
+			$attr = $this->attributes[$index];
+			unset($this->attributes[$index]);
+
+			return $attr;
+		}
+
+		return null;
+	}
+
+	public static function createFromSchema(array|object $schema, ?Factory $factory = null): self
+	{
+		if (is_array($schema) && array_is_list($schema)) {
+			throw new \InvalidArgumentException('Schema must be an array of key=>value pairs or an object.');
+		}
+
+		$factory ??= new Factory();
+		$schema = (array)$schema;
+		$self = new self();
+
+		foreach ($schema as $attributeName => $attributeValue) {
+			$self->add($factory->create($attributeName, $attributeValue));
+		}
+
+		return $self;
+	}
+
+	public function __toArray(): array
+	{
+		return $this->attributes;
 	}
 
 	public function get(string|Attribute $attribute): Attribute
@@ -150,6 +190,8 @@ class Set implements \Countable, \IteratorAggregate
 	{
 		$this->allowed = array_merge($this->allowed, $attrs);
 
+		$this->assertAllowed(...$this->allowed);
+
 		return $this;
 	}
 
@@ -249,25 +291,29 @@ class Set implements \Countable, \IteratorAggregate
 	/**
 	 * Set an attribute, replacing any existing attribute of the same class.
 	 */
-	public function set(Attribute ...$attrs): void
+	public function set(Attribute ...$attrs): self
 	{
 		foreach ($attrs as $attribute) {
 			$this->assertAllowed($attribute);
 			$this->remove($attribute);
 			$this->attributes[] = $attribute;
 		}
+
+		return $this;
 	}
 
 	/**
 	 * Replace an attribute with another attribute, only if the attribute class exists in the set.
 	 */
-	public function replace(string|Attribute $attribute): void
+	public function replace(string|Attribute $attribute): self
 	{
 		$index = $this->indexOf($attribute);
 
 		if ($index !== null) {
 			$this->attributes[$index] = $attribute;
 		}
+
+		return $this;
 	}
 
 	/**
@@ -373,15 +419,42 @@ class Set implements \Countable, \IteratorAggregate
 
 	public function __toString(): string
 	{
-		return array_reduce(
-			$this->attributes,
-			fn(string $attrs, Attribute $attr): string => $attrs . ' ' . $attr,
-			''
-		);
+		$str = '';
+
+		/** @var Attribute $attribute */
+		foreach ($this->attributes as $attribute) {
+			// boolean attributes are special because they are either present for
+			// true or absent for false. If the value is false, then the attribute
+			// should not be rendered.
+			if ($attribute instanceof Attribute\Boolean && $attribute->value === false) {
+				continue;
+			}
+
+			$str .= ' ' . $attribute;
+		}
+
+		return $str;
 	}
 
 	public function __clone(): void
 	{
 		$this->attributes = array_map(fn($attr) => clone $attr, $this->attributes);
+	}
+
+	/**
+	 * Asserts that the set contains the required attributes.
+	 *
+	 * @param class-string $attr The Fully Qualified Class Name of the attribute to require.
+	 * @param class-string ...$attrs Additional attributes to require, using their Fully Qualified Class Names.
+	 */
+	public function require(string $attr, string ...$attrs): self
+	{
+		foreach ([$attr, ...$attrs] as $attr) {
+			if (!$this->contains($attr)) {
+				throw new Exception('Attribute "' . $attr . '" is required but not found in set.');
+			}
+		}
+
+		return $this;
 	}
 }

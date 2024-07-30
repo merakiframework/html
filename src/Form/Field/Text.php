@@ -13,6 +13,7 @@ final class Text extends Field
 		Attribute\Max::class,		// max character length of the text field
 		Attribute\Pattern::class,	// regex pattern to match against
 		Attribute\Multiline::class,	// allow linebreaks (usually renders as textarea instead of input)
+		Attribute\Placeholder::class,
 	];
 
 	public function getDefaultAttributes(): array
