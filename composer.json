@@ -1,5 +1,6 @@
 {
     "name": "meraki/html",
+	"description": "A library for generating, manipulating and rendering HTML elements.",
     "type": "library",
     "require-dev": {
         "meraki/test-suite": "^0.3.0"
@@ -27,6 +28,6 @@
         "phpseclib/bcmath_compat": "^2.0"
     },
 	"scripts": {
-		"test": "phpunit"
+		"test": "./vendor/bin/phpunit"
 	}
 }
