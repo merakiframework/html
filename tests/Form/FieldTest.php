@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Meraki\Html\Form;
 
-use Meraki\Html\Form\Field\Schema;
-use Meraki\Html\Form\Field\Text;
+use Meraki\Html\Attribute;
+use Meraki\Html\Form\Field;
 use Meraki\TestSuite\TestCase;
 
 final class FieldTest extends TestCase
@@ -32,8 +32,8 @@ final class FieldTest extends TestCase
 	 */
 	public function it_can_create_a_field_from_a_schema(): void
 	{
-		$schema = Schema::fromArray([
-			'type' => 'text',
+		$field = Field::createFromSchema([
+			'type' => Field\Text::class,
 			'name' => 'aa__11',
 			'label' => 'Username',
 			'required' => true,
@@ -41,8 +41,12 @@ final class FieldTest extends TestCase
 			'max' => 20,
 		]);
 
-		$field = Field::createFromSchema($schema);
-
-		$this->assertEquals($schema->createField(), $field);
+		$this->assertInstanceOf(Field::class, $field);
+		$this->assertInstanceOf(Field\Text::class, $field);
+		$this->assertTrue($field->attributes->contains(new Attribute\Name('aa__11')));
+		$this->assertTrue($field->attributes->contains(new Attribute\Label('Username')));
+		$this->assertTrue($field->attributes->contains(new Attribute\Required()));
+		$this->assertTrue($field->attributes->contains(new Attribute\Min(3)));
+		$this->assertTrue($field->attributes->contains(new Attribute\Max(20)));
 	}
 }

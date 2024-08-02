@@ -22,8 +22,12 @@ final class FormTest extends TestCase
 	 */
 	public function it_is_an_element(): void
 	{
-		$form = new Form('login_form', '/login');
+		$attributes = new Attribute\Set();
+		$attributes->set(new Attribute\Action('/login'));
+
+		$form = new Form($attributes);
 
 		$this->assertInstanceOf(Element::class, $form);
+		$this->assertInstanceOf(Form::class, $form);
 	}
 }
