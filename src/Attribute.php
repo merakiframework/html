@@ -48,7 +48,7 @@ class Attribute
 
 	public function __toString(): string
 	{
-		if ($this instanceof Boolean) {
+		if ($this instanceof Attribute\Boolean) {
 			return $this->name;
 		}
 

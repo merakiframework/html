@@ -51,6 +51,8 @@ class FieldRenderer
 			$str .= $this->renderHintElement($hint, $field);
 		}
 
+		// @todo: add support for rendering prefixes and suffixes
+
 		$str .= $this->renderInputElement($inputAttrs, $field);
 		$str .= $this->renderValidationMessagesElement($field);
 		$str .= "</{$field->tagName}>";
