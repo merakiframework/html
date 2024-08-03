@@ -92,7 +92,7 @@ $form = Meraki\Html\Form::createFromSchema([
 // var_dump($nameField);
 // var_dump($nameField->isValid());
 
-echo (new Meraki\Html\Renderer())->render($form);
+echo (new Meraki\Html\Renderer())->changeSubmitButtonText('Book')->render($form);
 
 
 // $el = new Meraki\Html\Form\Field\Money(

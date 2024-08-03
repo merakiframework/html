@@ -6,9 +6,18 @@ use Meraki\Html\Form\Field;
 
 class Renderer
 {
+	private $submitButtonText = 'Submit';
+
 	public function supports(Element $element): bool
 	{
 		return true;
+	}
+
+	public function changeSubmitButtonText(string $text): self
+	{
+		$this->submitButtonText = $text;
+
+		return $this;
 	}
 
 	public function render(Element $element): string
@@ -38,6 +47,9 @@ class Renderer
 		foreach ($form->fields as $field) {
 			$content .= $this->render($field);
 		}
+
+		// add submit button
+		$content .= '<input type="submit" value="' . $this->escapeValue($this->submitButtonText) . '">';
 
 		return $content;
 	}
