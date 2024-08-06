@@ -28,6 +28,7 @@ final class Factory
 		'entropy' => Entropy::class,					// custom attribute
 
 		'first-day-of-week' => FirstDayOfWeek::class,	// custom attribute
+		'firstDayOfWeek' => FirstDayOfWeek::class,		// custom attribute
 		'for' => For_::class,
 
 		'hidden' => Hidden::class,
