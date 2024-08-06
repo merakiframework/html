@@ -23,11 +23,15 @@ final class Policy extends Attribute implements Constraint
 {
 	public const PREDEFINED_RULE_SETS = ['strict', 'moderate', 'basic', 'relaxed', 'unrestricted'];
 
-	public function __construct(private array $rules = [])
+	public function __construct(private array|string $rules = [])
 	{
 		$this->setName('policy');
 
-		if (count($rules) > 0) {
+		// @todo: this logic belongs in the attribute factory
+		if (is_string($rules)) {
+			$rules = self::parse(trim($rules));
+			$this->setValue($rules->value);
+		} elseif (is_array($rules) && count($rules) > 0) {
 			$this->applyRules($rules);
 		} else {
 			$this->setValue('');
