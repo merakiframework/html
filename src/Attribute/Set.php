@@ -287,7 +287,7 @@ class Set implements \Countable, \IteratorAggregate
 	{
 		foreach ($attrs as $attribute) {
 			$this->assertAllowed($attribute);
-			$this->remove($attribute);
+			$this->remove($attribute::class);
 			$this->attributes[] = $attribute;
 		}
 
