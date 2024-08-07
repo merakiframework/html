@@ -17,36 +17,36 @@ final class Options extends Attribute implements \IteratorAggregate, \Countable
 	{
 		parent::__construct('options', '');
 
-		foreach ($options as $fieldName => $fieldLabel) {
-			$this->add($fieldName, $fieldLabel);
+		foreach ($options as $optionName => $optionlabel) {
+			$this->add($optionName, $optionlabel);
 		}
 	}
 
-	public function add(string $fieldName, string $fieldLabel): void
+	public function add(string $optionName, string $optionlabel): void
 	{
-		if (mb_strlen($fieldName) === 0) {
+		if (mb_strlen($optionName) === 0) {
 			throw new \InvalidArgumentException('Name for enum value must not be empty.');
 		}
 
-		if (mb_strlen($fieldLabel) === 0) {
+		if (mb_strlen($optionlabel) === 0) {
 			throw new \InvalidArgumentException('Label for enum value must not be empty.');
 		}
 
-		$this->options[$fieldName] = $fieldLabel;
+		$this->options[$optionName] = $optionlabel;
 		$this->updateValue();
 	}
 
-	public function remove(string $fieldName): void
+	public function remove(string $optionName): void
 	{
-		if (isset($this->options[$fieldName])) {
-			unset($this->options[$fieldName]);
+		if (isset($this->options[$optionName])) {
+			unset($this->options[$optionName]);
 			$this->updateValue();
 		}
 	}
 
-	public function has(string $fieldName): bool
+	public function has(string $optionName): bool
 	{
-		return isset($this->options[$fieldName]);
+		return isset($this->options[$optionName]);
 	}
 
 	private function updateValue(): void
@@ -56,8 +56,8 @@ final class Options extends Attribute implements \IteratorAggregate, \Countable
 		// the allowed-values attribute has the same format as the style attribute
 		// the part before the colon is the name of the enum value
 		// the part after the colon is the label of the enum value
-		foreach ($this->options as $fieldName => $fieldLabel) {
-			$value .= $fieldName . ':' . $fieldLabel . ';';
+		foreach ($this->options as $optionName => $optionlabel) {
+			$value .= $optionName . ':' . $optionlabel . ';';
 		}
 
 		$this->setValue($value);
