@@ -57,6 +57,54 @@ final class SetTest extends TestCase
 		$this->assertFalse($set->allowed(Attribute\Class_::class));
 	}
 
+	/**
+	 * @test
+	 */
+	public function can_check_if_an_attribute_is_contained_in_the_set_by_class(): void
+	{
+		$set = new Set(Attribute\Name::class);
+		$set->add(new Attribute\Name('username'));
+
+		$this->assertTrue($set->contains(Attribute\Name::class));
+	}
+
+	/**
+	 * @test
+	 */
+	public function can_check_if_an_attribute_is_contained_in_the_set_by_instance(): void
+	{
+		$name = new Attribute\Name('username');
+		$set = new Set(Attribute\Name::class);
+		$set->add($name);
+
+		$this->assertTrue($set->contains($name));
+		$this->assertFalse($set->contains(new Attribute\Name('username2')));
+	}
+
+	/**
+	 * @test
+	 */
+	public function can_find_an_attribute_by_its_class(): void
+	{
+		$set = new Set(Attribute\Name::class);
+		$set->add(new Attribute\Name('username'));
+
+		$this->assertNotNull($set->find(Attribute\Name::class));
+	}
+
+	/**
+	 * @test
+	 */
+	public function can_find_an_attribute_by_its_instance(): void
+	{
+		$name = new Attribute\Name('username');
+		$set = new Set(Attribute\Name::class);
+		$set->add($name);
+
+		$this->assertEquals($name, $set->find($name));
+		$this->assertNull($set->find(new Attribute\Name('username2')));
+	}
+
 	private static function globalAttributes(): array
 	{
 		return [

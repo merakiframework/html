@@ -255,17 +255,9 @@ class Set implements \Countable, \IteratorAggregate
 	 */
 	public function find(string|Attribute $attr): ?Attribute
 	{
-		if ($attr instanceof Attribute) {
-			$attr = $attr::class;
-		}
+		$index = $this->indexOf($attr);
 
-		foreach ($this->attributes as $attribute) {
-			if ($attribute instanceof $attr) {
-				return $attribute;
-			}
-		}
-
-		return null;
+		return $index !== null ? $this->attributes[$index] : null;
 	}
 
 	/**
@@ -354,6 +346,9 @@ class Set implements \Countable, \IteratorAggregate
 	/**
 	 * Check if an attribute exists in the set.
 	 *
+	 * Pass an instance to check if the exact instance (the attribute's equals() method) exists in the set.
+	 * Pass a class name to check if the attribute is set.
+	 *
 	 * @param class-string|Attribute $attribute The fully qualified class name or the attribute instance.
 	 */
 	public function contains(string|Attribute $attribute): bool
@@ -380,15 +375,41 @@ class Set implements \Countable, \IteratorAggregate
 		return $this;
 	}
 
+	/**
+	 * Pass an instance to check if the exact instance (the attribute's equals() method) exists in the set.
+	 * Pass a class name to check if the attribute is set.
+	 *
+	 * @param string|\Meraki\Html\Attribute $attribute
+	 * @return int|null
+	 */
 	public function indexOf(string|Attribute $attribute): ?int
 	{
-		$attribute = $this->find($attribute);
+		if ($attribute instanceof Attribute) {
+			return $this->indexOfByInstance($attribute);
+		}
 
-		if ($attribute !== null) {
-			foreach ($this->attributes as $index => $existingAttribute) {
-				if ($attribute instanceof ($existingAttribute::class)) {
-					return $index;
-				}
+		return $this->indexOfByClass($attribute);
+	}
+
+	private function indexOfByInstance(Attribute $attribute): ?int
+	{
+		foreach ($this->attributes as $index => $existingAttribute) {
+			if ($existingAttribute->equals($attribute)) {
+				return $index;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param class-string $attribute The Fully Qualified Class Name of the attribute to find.
+	 */
+	private function indexOfByClass(string $attribute): ?int
+	{
+		foreach ($this->attributes as $index => $existingAttribute) {
+			if ($existingAttribute instanceof $attribute) {
+				return $index;
 			}
 		}
 
