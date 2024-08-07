@@ -188,7 +188,7 @@ abstract class Field extends Element
 		// "short circuit" the validation process
 		// and set field errors to indicate field is required
 		if ($this->inputRequired() && !$value->provided()) {
-			$this->attributes->replace($value);
+			$this->attributes->set($value);
 			$this->errors = ['This field is required.'];
 			$this->valueHasChanged = true;
 			return;
@@ -199,7 +199,7 @@ abstract class Field extends Element
 		$this->errors = $result->errors;
 		$this->valueHasChanged = !$this->originalValue->equals($value);
 
-		$this->attributes->replace($value);
+		$this->attributes->set($value);
 	}
 
 	public function isDisabled(): bool
