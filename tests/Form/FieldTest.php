@@ -49,4 +49,17 @@ final class FieldTest extends TestCase
 		$this->assertTrue($field->attributes->contains(new Attribute\Min(3)));
 		$this->assertTrue($field->attributes->contains(new Attribute\Max(20)));
 	}
+
+	/**
+	 * @test
+	 */
+	public function the_name_can_be_changed(): void
+	{
+		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'));
+
+		$field->name('username2');
+
+		$this->assertTrue($field->attributes->contains(Attribute\Name::class));
+		$this->assertEquals('username2', $field->attributes->get(Attribute\Name::class)->value);
+	}
 }

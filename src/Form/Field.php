@@ -301,7 +301,7 @@ abstract class Field extends Element
 
 	public function name(string $name): self
 	{
-		$this->attributes->add(new Attribute\Name($name));
+		$this->attributes->set(new Attribute\Name($name));
 
 		return $this;
 	}
