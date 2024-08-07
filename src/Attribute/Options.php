@@ -44,6 +44,11 @@ final class Options extends Attribute implements \IteratorAggregate, \Countable
 		}
 	}
 
+	public function has(string $fieldName): bool
+	{
+		return isset($this->options[$fieldName]);
+	}
+
 	private function updateValue(): void
 	{
 		$value = '';
