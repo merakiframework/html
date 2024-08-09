@@ -62,4 +62,16 @@ final class FieldTest extends TestCase
 		$this->assertTrue($field->attributes->contains(Attribute\Name::class));
 		$this->assertEquals('username2', $field->attributes->get(Attribute\Name::class)->value);
 	}
+
+	/**
+	 * @test
+	 */
+	public function prefilling_value_with_null_removes_the_default_value(): void
+	{
+		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'), new Attribute\Value('github'));
+
+		$field->prefill(null);
+
+		$this->assertFalse($field->attributes->contains(Attribute\Value::class));
+	}
 }

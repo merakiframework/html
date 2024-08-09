@@ -132,10 +132,17 @@ abstract class Field extends Element
 
 	public function prefill(mixed $value): self
 	{
+		if ($value === null) {
+			$this->originalValue = null;
+			$this->attributes->remove(Attribute\Value::class);	// bypass validation process
+
+			return $this;
+		}
+
 		$value = new Attribute\Value($value);
 
 		$this->originalValue = $value;
-		$this->setValue($value);
+		$this->setValue($value);	// make sure prefilled values are validated
 
 		return $this;
 	}
@@ -185,12 +192,18 @@ abstract class Field extends Element
 
 	protected function setValue(Attribute\Value $value): void
 	{
+
 		// "short circuit" the validation process
 		// and set field errors to indicate field is required
 		if ($this->inputRequired() && !$value->provided()) {
 			$this->attributes->set($value);
 			$this->errors = ['This field is required.'];
 			$this->valueHasChanged = true;
+			return;
+		} elseif (!$value->provided()) {
+			$hasValue = $this->attributes->find(Attribute\Value::class) !== null;
+			$this->attributes->remove(Attribute\Value::class);
+			$this->valueHasChanged = $hasValue;
 			return;
 		}
 
