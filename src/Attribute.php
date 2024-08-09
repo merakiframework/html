@@ -48,6 +48,10 @@ class Attribute
 
 	public function __toString(): string
 	{
+		if ($this->value === null) {
+			return '';
+		}
+
 		if ($this instanceof Attribute\Boolean) {
 			return $this->name;
 		}

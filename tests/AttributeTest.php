@@ -21,5 +21,21 @@ abstract class AttributeTest extends TestCase
 		$this->assertTrue(is_subclass_of($this->createAttribute(), Attribute::class));
 	}
 
+	/**
+	 * @test
+	 */
+	public function an_attribute_with_a_null_value_is_cast_as_empty_string(): void
+	{
+		$attr = new class extends Attribute {
+			public function __construct()
+			{
+				$this->setName('test');
+				$this->setValue(null);
+			}
+		};
+
+		$this->assertEquals('', (string) $attr);
+	}
+
 	abstract protected function createAttribute(): Attribute;
 }
