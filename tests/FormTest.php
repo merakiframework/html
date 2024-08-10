@@ -30,4 +30,28 @@ final class FormTest extends TestCase
 		$this->assertInstanceOf(Element::class, $form);
 		$this->assertInstanceOf(Form::class, $form);
 	}
+
+	/**
+	 * @test
+	 */
+	public function can_put_a_form_to_the_url(): void
+	{
+		$form = Form::putTo('/login');
+
+		$this->assertTrue($form->attributes->contains(new Attribute\Action('/login')));
+		$this->assertTrue($form->attributes->contains(Attribute\Method::class));
+		$this->assertTrue($form->attributes->get(Attribute\Method::class)->equals(new Attribute\Method('put')));
+	}
+
+	/**
+	 * @test
+	 */
+	public function can_post_a_form_to_the_url(): void
+	{
+		$form = Form::postTo('/login');
+
+		$this->assertTrue($form->attributes->contains(new Attribute\Action('/login')));
+		$this->assertTrue($form->attributes->contains(Attribute\Method::class));
+		$this->assertTrue($form->attributes->get(Attribute\Method::class)->equals(new Attribute\Method('post')));
+	}
 }

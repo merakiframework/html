@@ -44,9 +44,20 @@ final class Form extends Element
 		return (new self())->post($path, $placeholders);
 	}
 
-	public function put(string $path, array $placeholders = [])
+	public function put(string $path, array $placeholders = []): self
 	{
-		return $this->withMethod('put')->withAction($path)->expandAction($placeholders);
+		$form = $this->withMethod('put')->withAction($path);
+		$form->attributes->get(Attribute\Action::class)->expand($placeholders);
+
+		return $this;
+	}
+
+	public function post(string $path, array $placeholders = []): self
+	{
+		$form = $this->withMethod('post')->withAction($path);
+		$form->attributes->get(Attribute\Action::class)->expand($placeholders);
+
+		return $this;
 	}
 
 	public function withMethod(string $method): self
