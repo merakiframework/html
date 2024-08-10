@@ -13,6 +13,26 @@ final class Method extends Attribute
 		$this->setValue($value);
 	}
 
+	public function isPost(): bool
+	{
+		return $this->value === 'POST';
+	}
+
+	public function isPut(): bool
+	{
+		return $this->value === 'PUT';
+	}
+
+	public function isDelete(): bool
+	{
+		return $this->value === 'DELETE';
+	}
+
+	public function isPatch(): bool
+	{
+		return $this->value === 'PATCH';
+	}
+
 	protected function setValue(mixed $value): void
 	{
 		$value = trim($value);
