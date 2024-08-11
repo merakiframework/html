@@ -13,10 +13,9 @@ use Meraki\Html\Form\Field\ValidationResult;
 abstract class Field extends Element
 {
 	public mixed $value = null;
-	protected ?Attribute\Value $originalValue = null;
 	public array $errors = [];
 	public bool $valueHasChanged = false;
-	public mixed $defaultValue = null;
+	public Attribute\Value $defaultValue;
 	public bool $inputGiven = false;
 
 	public static array $allowedAttributes = [
@@ -57,7 +56,8 @@ abstract class Field extends Element
 
 		// @todo: implement required attributes
 
-		$this->originalValue = $allAttributes->removeAndReturn(Attribute\Value::class);
+		$defaultValue = $allAttributes->removeAndReturn(Attribute\Value::class);
+		$this->defaultValue = $defaultValue ?? new Attribute\Value(null);
 
 		parent::__construct('div', $allAttributes);
 
@@ -132,17 +132,10 @@ abstract class Field extends Element
 
 	public function prefill(mixed $value): self
 	{
-		if ($value === null) {
-			$this->originalValue = null;
-			$this->attributes->remove(Attribute\Value::class);	// bypass validation process
-
-			return $this;
-		}
-
 		$value = new Attribute\Value($value);
 
-		$this->originalValue = $value;
-		$this->setValue($value);	// make sure prefilled values are validated
+		$this->defaultValue = $value;
+		$this->setValue($value);
 
 		return $this;
 	}
@@ -183,6 +176,13 @@ abstract class Field extends Element
 		return $this;
 	}
 
+	public function require(): self
+	{
+		$this->attributes->set(new Attribute\Required());
+
+		return $this;
+	}
+
 	public function inputRequired(): bool
 	{
 		$required =  $this->attributes->find(Attribute\Required::class);
@@ -192,7 +192,6 @@ abstract class Field extends Element
 
 	protected function setValue(Attribute\Value $value): void
 	{
-
 		// "short circuit" the validation process
 		// and set field errors to indicate field is required
 		if ($this->inputRequired() && !$value->provided()) {
@@ -200,17 +199,12 @@ abstract class Field extends Element
 			$this->errors = ['This field is required.'];
 			$this->valueHasChanged = true;
 			return;
-		} elseif (!$value->provided()) {
-			$hasValue = $this->attributes->find(Attribute\Value::class) !== null;
-			$this->attributes->remove(Attribute\Value::class);
-			$this->valueHasChanged = $hasValue;
-			return;
 		}
 
 		$result = $this->validate($value->value);
 		$value = new Attribute\Value($result->value);
 		$this->errors = $result->errors;
-		$this->valueHasChanged = !$this->originalValue->equals($value);
+		$this->valueHasChanged = !$this->defaultValue->equals($value);
 
 		$this->attributes->set($value);
 	}
@@ -259,8 +253,8 @@ abstract class Field extends Element
 		$this->errors = [];
 		$this->inputGiven = false;
 
-		if ($this->originalValue !== null) {
-			$this->prefill($this->originalValue->value);
+		if ($this->defaultValue !== null) {
+			$this->prefill($this->defaultValue->value);
 		} elseif ($this->isRequired()) {
 			$this->prefill(null);
 		}

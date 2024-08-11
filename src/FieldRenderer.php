@@ -173,22 +173,20 @@ class FieldRenderer
 
 	private function renderBooleanInput(Attribute\Set $inputAttrs, Field\Boolean $field): array
 	{
+		$value = $inputAttrs->get(Attribute\Value::class);
+
 		$inputAttrs->replace(new Attribute\Type('checkbox'));
-
-		$input = new Element('input', $inputAttrs);
-		$value = $input->attributes->find(Attribute\Value::class);
-
-		// add the "checked" attribute if value is "truthy"
-		if ($value ?: $field->isChecked()) {
-			$input->attributes->add(new Attribute\Checked());
-		}
 
 		// remove "value" attribute if it's a boolean
 		if ($value !== null && is_bool($value->value)) {
-			$input->attributes->remove($value);
+			$inputAttrs->remove($value);
 		}
 
-		return [$input];
+		if ($field->isChecked() || $value->provided()) {
+			$inputAttrs->add(new Attribute\Checked());
+		}
+
+		return [new Element('input', $inputAttrs)];
 	}
 
 	private function renderDateInput(Attribute\Set $inputAttrs, Field\Date $field): array
@@ -233,10 +231,10 @@ class FieldRenderer
 			$option->attributes->add(new Attribute\Value($valueName));
 			$option->setContent($valueLabel);
 
-			$value = $field->attributes->find(Attribute\Value::class);
+			$value = $field->attributes->get(Attribute\Value::class);
 
 			// set default "selected"
-			if (($value && $value->value === $valueName) || $field->defaultValue === $valueName) {
+			if ($value->value === $valueName) {
 				$option->attributes->add(new Attribute\Selected());
 			}
 
@@ -248,7 +246,7 @@ class FieldRenderer
 
 	private function renderMoneyInput(Attribute\Set $inputAttrs, Field\Money $field): array
 	{
-		$value = $inputAttrs->find(Attribute\Value::class);
+		$value = $inputAttrs->get(Attribute\Value::class);
 		$precision = $inputAttrs->removeAndReturn(Attribute\Precision::class);
 
 		$inputAttrs->replace(new Attribute\Type('number'));
@@ -256,14 +254,14 @@ class FieldRenderer
 		$input = new Element('input', $inputAttrs);
 
 		// set default value
-		if ($value === null || $value === '') {
+		if (!$value->provided()) {
 			if ($field->attributes->contains(Attribute\Min::class)) {
 				$value = $field->attributes->get(Attribute\Min::class)->value;
 			} else {
 				$value = '0.' . str_repeat('0', $precision->value);
 			}
 
-			$input->attributes->add(new Attribute\Value($value));
+			$input->attributes->set(new Attribute\Value($value));
 		}
 
 		// set default step constraint making sure it matches the precision
@@ -336,13 +334,13 @@ class FieldRenderer
 	{
 		// textarea input for multiline...
 		if ($field->attributes->contains(Attribute\Multiline::class)) {
-			$value = $inputAttrs->find(Attribute\Value::class);
+			$value = $inputAttrs->get(Attribute\Value::class);
 
 			$inputAttrs->remove(Attribute\Type::class, Attribute\Value::class);
 
 			$input = new Element('textarea', $inputAttrs);
 
-			if ($value !== null) {
+			if ($value->provided()) {
 				$input->setContent($value->value);
 			}
 		} else {

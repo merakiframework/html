@@ -20,6 +20,39 @@ final class FieldTest extends TestCase
 	/**
 	 * @test
 	 */
+	public function it_has_a_default_value_of_null_if_no_default_value_provided(): void
+	{
+		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'));
+
+		$this->assertTrue($field->attributes->contains(new Attribute\Value(null)));
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_default_value_can_be_provided(): void
+	{
+		$defaultValue = new Attribute\Value('github');
+		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'), $defaultValue);
+
+		$this->assertTrue($field->attributes->contains($defaultValue));
+	}
+
+	/**
+	 * @test
+	 */
+	public function the_default_value_can_be_changed(): void
+	{
+		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'), new Attribute\Value('github'));
+
+		$field->prefill(null);
+
+		$this->assertTrue($field->attributes->contains(new Attribute\Value(null)));
+	}
+
+	/**
+	 * @test
+	 */
 	// public function it_has_a_type(): void
 	// {
 	// 	$field = new Text('username');
@@ -61,17 +94,5 @@ final class FieldTest extends TestCase
 
 		$this->assertTrue($field->attributes->contains(Attribute\Name::class));
 		$this->assertEquals('username2', $field->attributes->get(Attribute\Name::class)->value);
-	}
-
-	/**
-	 * @test
-	 */
-	public function prefilling_value_with_null_removes_the_default_value(): void
-	{
-		$field = new Field\Text(new Attribute\Name('username'), new Attribute\Label('Username'), new Attribute\Value('github'));
-
-		$field->prefill(null);
-
-		$this->assertFalse($field->attributes->contains(Attribute\Value::class));
 	}
 }
