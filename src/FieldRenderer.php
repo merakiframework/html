@@ -175,7 +175,7 @@ class FieldRenderer
 	{
 		$value = $inputAttrs->get(Attribute\Value::class);
 
-		$inputAttrs->replace(new Attribute\Type('checkbox'));
+		$inputAttrs->set(new Attribute\Type('checkbox'));
 
 		// remove "value" attribute if it's a boolean
 		if ($value !== null && is_bool($value->value)) {
@@ -200,7 +200,7 @@ class FieldRenderer
 
 	private function renderDateTimeInput(Attribute\Set $inputAttrs, Field\DateTime $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('datetime-local'));
+		$inputAttrs->set(new Attribute\Type('datetime-local'));
 
 		$input = new Element('input', $inputAttrs);
 
@@ -211,7 +211,7 @@ class FieldRenderer
 
 	private function renderEmailAddressInput(Attribute\Set $inputAttrs, Field\EmailAddress $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('email'));
+		$inputAttrs->set(new Attribute\Type('email'));
 
 		return [new Element('input', $inputAttrs)];
 	}
@@ -249,7 +249,7 @@ class FieldRenderer
 		$value = $inputAttrs->get(Attribute\Value::class);
 		$precision = $inputAttrs->removeAndReturn(Attribute\Precision::class);
 
-		$inputAttrs->replace(new Attribute\Type('number'));
+		$inputAttrs->set(new Attribute\Type('number'));
 
 		$input = new Element('input', $inputAttrs);
 
@@ -288,21 +288,21 @@ class FieldRenderer
 
 	private function renderNameInput(Attribute\Set $inputAttrs, Field\Name $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('text'));
+		$inputAttrs->set(new Attribute\Type('text'));
 
 		return [new Element('input', $inputAttrs)];
 	}
 
 	private function renderNumberInput(Attribute\Set $inputAttrs, Field\Number $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('number'));
+		$inputAttrs->set(new Attribute\Type('number'));
 
 		return [new Element('input', $inputAttrs)];
 	}
 
 	private function renderPassphraseInput(Attribute\Set $inputAttrs, Field\Passphrase $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('password'));
+		$inputAttrs->set(new Attribute\Type('password'));
 
 		$input = new Element('input', $inputAttrs);
 
@@ -313,7 +313,7 @@ class FieldRenderer
 
 	private function renderPasswordInput(Attribute\Set $inputAttrs, Field\Password $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('password'));
+		$inputAttrs->set(new Attribute\Type('password'));
 
 		$input = new Element('input', $inputAttrs);
 
@@ -325,7 +325,7 @@ class FieldRenderer
 
 	private function renderPhoneNumberInput(Attribute\Set $inputAttrs, Field\PhoneNumber $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('tel'));
+		$inputAttrs->set(new Attribute\Type('tel'));
 
 		return [new Element('input', $inputAttrs)];
 	}
@@ -361,7 +361,7 @@ class FieldRenderer
 
 	private function renderUrlInput(Attribute\Set $inputAttrs, Field\Url $field): array
 	{
-		$inputAttrs->replace(new Attribute\Type('url'));
+		$inputAttrs->set(new Attribute\Type('url'));
 
 		return [new Element('input', $inputAttrs)];
 	}
@@ -373,7 +373,7 @@ class FieldRenderer
 
 		$inputAttrs->allow(Attribute\Pattern::class);	// allow pattern attribute for rendering
 		$inputAttrs->add(new Attribute\Pattern($pattern));
-		$inputAttrs->replace(new Attribute\Type('text'));
+		$inputAttrs->set(new Attribute\Type('text'));
 
 		$input = new Element('input', $inputAttrs);
 
