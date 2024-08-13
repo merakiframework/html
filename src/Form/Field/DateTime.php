@@ -25,6 +25,10 @@ final class DateTime extends Field
 
 	public function validate(mixed $value): ValidationResult
 	{
+		if (!$this->isRequired() && ($value === null || $value === '')) {
+			return ValidationResult::passed($value);
+		}
+
 		$errors = [];
 		$min = $this->toLocalDateTime($this->attributes->find(Attribute\Min::class));
 		$max = $this->toLocalDateTime($this->attributes->find(Attribute\Max::class));
