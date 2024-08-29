@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Meraki\Html\Form\Field;
 
 use Meraki\Html\Form\Field;
+use Meraki\Html\Attribute;
 
 final class Set implements \Countable, \IteratorAggregate
 {
@@ -136,7 +137,7 @@ final class Set implements \Countable, \IteratorAggregate
 	public function findByName(string $name): ?Field
 	{
 		foreach ($this->fields as $field) {
-			if (strcasecmp($field->name, $name) === 0) {
+			if ($field->name->equals(new Attribute\Name($name))) {
 				return $field;
 			}
 		}
