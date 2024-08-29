@@ -28,6 +28,6 @@
         "phpseclib/bcmath_compat": "^2.0"
     },
 	"scripts": {
-		"test": "./vendor/bin/phpunit"
+		"test": "phpunit"
 	}
 }
