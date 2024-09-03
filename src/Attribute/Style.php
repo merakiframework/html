@@ -26,19 +26,21 @@ final class Style extends Attribute
 	/**
 	 * Set one or more styles for the style attribute.
 	 */
-	public function set(string|array $name, null|string|int|\Stringable $value = null): void
+	public function set(string|array $name, null|string|int|\Stringable $value = null): self
 	{
 		if (is_array($name) && $value === null) {
 			foreach ($name as $style => $value) {
 				$this->set($style, $value);
 			}
 
-			return;
+			return $this;
 		}
 
 		$this->styles[$name] = $value;
 
 		$this->setValue($this->styles);
+
+		return $this;
 	}
 
 	public function get(string $name): mixed
@@ -46,10 +48,12 @@ final class Style extends Attribute
 		return $this->styles[$name] ?? null;
 	}
 
-	public function remove(string $style): void
+	public function remove(string $style): self
 	{
 		unset($this->styles[$style]);
 		$this->setValue($this->styles);
+
+		return $this;
 	}
 
 	public function exists(string $style): bool
