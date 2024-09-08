@@ -26,6 +26,10 @@ final class Date extends Field
 
 	public function validate(mixed $value): ValidationResult
 	{
+		if (!$this->isRequired() && ($value === null || $value === '')) {
+			return ValidationResult::passed($value);
+		}
+
 		$errors = [];
 		$min = $this->toLocalDate($this->attributes->find(Attribute\Min::class));
 		$max = $this->toLocalDate($this->attributes->find(Attribute\Max::class));
