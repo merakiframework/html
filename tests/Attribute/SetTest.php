@@ -126,6 +126,51 @@ final class SetTest extends TestCase
 		$this->assertEquals(2, $set->indexOf($style));
 	}
 
+	/**
+	 * @test
+	 */
+	public function can_create_a_default_attribute_using_factory_if_not_found(): void
+	{
+		$set = new Set();
+
+		$this->assertNull($set->find(Attribute\Class_::class));
+
+		$class = $set->findOrCreate(Attribute\Class_::class, fn() => new Attribute\Class_('foo'));
+
+		$this->assertNotNull($class);
+	}
+
+	/**
+	 * @test
+	 */
+	public function a_default_factory_is_called_if_trying_to_find_an_attribute_that_does_not_exist(): void
+	{
+		$set = new Set();
+
+		$this->assertNull($set->find(Attribute\Class_::class));
+
+		$class = $set->findOrCreate(Attribute\Class_::class);
+
+		$this->assertNotNull($class);
+	}
+
+	/**
+	 * @test
+	 */
+	public function arguments_can_be_passed_to_the_default_factory(): void
+	{
+		$set = new Set();
+
+		$this->assertNull($set->find(Attribute\Class_::class));
+
+		$class = $set->findOrCreate(Attribute\Class_::class, 'foo', 'bar');
+
+		$this->assertNotNull($class);
+		$this->assertTrue($class->contains('foo'));
+		$this->assertTrue($class->contains('bar'));
+		$this->assertEquals('foo bar', $class->value);
+	}
+
 	private static function globalAttributes(): array
 	{
 		return [

@@ -267,18 +267,42 @@ class Set implements \Countable, \IteratorAggregate
 	 * @param class-string|string|Attribute $attr The fully qualified class name of the attribute to find or create.
 	 * @param array $args The arguments to pass to the attribute constructor if the attribute does not exist.
 	 */
-	public function findOrCreate(string|Attribute $attr, callable $creator): Attribute
+	public function findOrCreate(string|Attribute $attr, mixed ...$creatorOrArgs): Attribute
 	{
 		$this->assertAllowed($attr);
 
 		$attribute = $this->find($attr);
 
 		if ($attribute === null) {
-			$attribute = $creator();
+			$attribute = $this->createAttribute($attr, $creatorOrArgs);
 			$this->add($attribute);
 		}
 
 		return $attribute;
+	}
+
+	private function createAttribute(string|Attribute $attr, array $creatorOrArgs): Attribute
+	{
+		// factory function provided
+		if (isset($creatorOrArgs[0]) && is_callable($creatorOrArgs[0])) {
+			return $creatorOrArgs[0]($this);
+		}
+
+		// create own factory based of attribute that could not be found, if it exists
+		// and pass arguments to the factory
+		$fqcn = $attr instanceof Attribute ? $attr::class : $attr;
+
+		if (class_exists($fqcn)) {
+			return new $fqcn(...$creatorOrArgs);
+		}
+
+		// finally create a new instance of the `Attribute` superclass and just pass name and value
+		if (count($creatorOrArgs) === 2 && is_string($creatorOrArgs[0])) {
+			return new Attribute($creatorOrArgs[0], $creatorOrArgs[1]);
+		}
+
+		// throw exception if no factory could be created
+		throw new \RuntimeException('Could not create factory for attribute "' . $fqcn . '".');
 	}
 
 	/**
