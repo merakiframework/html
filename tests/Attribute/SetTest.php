@@ -60,49 +60,70 @@ final class SetTest extends TestCase
 	/**
 	 * @test
 	 */
-	public function can_check_if_an_attribute_is_contained_in_the_set_by_class(): void
+	public function can_get_index_of_an_attribute_by_its_name(): void
 	{
-		$set = new Set(Attribute\Name::class);
-		$set->add(new Attribute\Name('username'));
+		$set = new Set();
 
-		$this->assertTrue($set->contains(Attribute\Name::class));
+		$set->add(
+			new Attribute\Class_('foo'),
+			new Attribute('popover', ''),
+			new Attribute\Style(['color' => 'red']),
+		);
+
+		$this->assertEquals(0, $set->indexOf('class'));
+		$this->assertEquals(1, $set->indexOf('popover'));
+		$this->assertEquals(2, $set->indexOf('style'));
 	}
 
 	/**
 	 * @test
 	 */
-	public function can_check_if_an_attribute_is_contained_in_the_set_by_instance(): void
+	public function can_get_index_of_attribute_by_its_fqcn(): void
 	{
-		$name = new Attribute\Name('username');
-		$set = new Set(Attribute\Name::class);
-		$set->add($name);
+		$set = new Set();
 
-		$this->assertTrue($set->contains($name));
-		$this->assertFalse($set->contains(new Attribute\Name('username2')));
+		$set->add(
+			new Attribute\Class_('foo'),
+			new Attribute('popover', ''),
+			new Attribute\Style(['color' => 'red']),
+		);
+
+		$this->assertEquals(0, $set->indexOf(Attribute\Class_::class));
+		$this->assertEquals(2, $set->indexOf(Attribute\Style::class));
 	}
 
 	/**
 	 * @test
 	 */
-	public function can_find_an_attribute_by_its_class(): void
+	public function trying_to_get_index_of_superclass_by_fqcn_throws_error(): void
 	{
-		$set = new Set(Attribute\Name::class);
-		$set->add(new Attribute\Name('username'));
+		$exception = new \InvalidArgumentException('Cannot check for the "Meraki\\Html\\Attribute" superclass unless passed as instance.');
+		$set = new Set();
 
-		$this->assertNotNull($set->find(Attribute\Name::class));
+		$set->add(
+			new Attribute\Class_('foo'),
+			new Attribute('popover', ''),
+			new Attribute\Style(['color' => 'red']),
+		);
+
+		$this->assertThrows($exception, fn() => $set->indexOf(Attribute::class));
 	}
 
 	/**
 	 * @test
 	 */
-	public function can_find_an_attribute_by_its_instance(): void
+	public function can_get_index_of_attribute_by_its_instance(): void
 	{
-		$name = new Attribute\Name('username');
-		$set = new Set(Attribute\Name::class);
-		$set->add($name);
+		$class = new Attribute\Class_('foo');
+		$popover = new Attribute('popover', '');
+		$style = new Attribute\Style(['color' => 'red']);
+		$set = new Set();
 
-		$this->assertEquals($name, $set->find($name));
-		$this->assertNull($set->find(new Attribute\Name('username2')));
+		$set->add($class, $popover, $style);
+
+		$this->assertEquals(0, $set->indexOf($class));
+		$this->assertEquals(1, $set->indexOf($popover));
+		$this->assertEquals(2, $set->indexOf($style));
 	}
 
 	private static function globalAttributes(): array

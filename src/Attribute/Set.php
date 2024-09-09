@@ -7,6 +7,7 @@ use Meraki\Html\Attribute;
 use Meraki\Html\Exception\AttributesNotAllowed;
 use Meraki\Html\Form\Field\Constraint;
 use Exception;
+use InvalidArgumentException;
 
 class Set implements \Countable, \IteratorAggregate
 {
@@ -251,7 +252,7 @@ class Set implements \Countable, \IteratorAggregate
 	/**
 	 * Find an attribute by its class name.
 	 *
-	 * @param class-string $attr The fully qualified class name of the attribute to find.
+	 * @param class-string|string|Attribute $attr The fully qualified class name of the attribute to find.
 	 */
 	public function find(string|Attribute $attr): ?Attribute
 	{
@@ -263,10 +264,10 @@ class Set implements \Countable, \IteratorAggregate
 	/**
 	 * Find an attribute by its class name or create a new instance of the attribute if it does not exist.
 	 *
-	 * @param class-string $attr The fully qualified class name of the attribute to find or create.
+	 * @param class-string|string|Attribute $attr The fully qualified class name of the attribute to find or create.
 	 * @param array $args The arguments to pass to the attribute constructor if the attribute does not exist.
 	 */
-	public function findOrCreate(string $attr, callable $creator): Attribute
+	public function findOrCreate(string|Attribute $attr, callable $creator): Attribute
 	{
 		$this->assertAllowed($attr);
 
@@ -309,20 +310,6 @@ class Set implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * Find an attribute by its name.
-	 */
-	public function findByName(string $name): ?Attribute
-	{
-		foreach ($this->attributes as $attribute) {
-			if ($attribute->hasNameOf($name)) {
-				return $attribute;
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Add an attribute to the set, if it does not already exist.
 	 */
 	public function add(Attribute ...$attrs): self
@@ -338,7 +325,7 @@ class Set implements \Countable, \IteratorAggregate
 		return $this;
 	}
 
-	public function exists(Attribute $attribute): bool
+	public function exists(string|Attribute $attribute): bool
 	{
 		return $this->indexOf($attribute) !== null;
 	}
@@ -376,25 +363,35 @@ class Set implements \Countable, \IteratorAggregate
 	}
 
 	/**
-	 * Pass an instance to check if the exact instance (the attribute's equals() method) exists in the set.
-	 * Pass a class name to check if the attribute is set.
+	 * Check if an attribute exists in the set.
 	 *
-	 * @param string|\Meraki\Html\Attribute $attribute
+	 * You can check for an attribute by passing either the fully
+	 * qualified class name, the attribute instance, or the attribute
+	 * name.
+	 *
+	 * @param class-string|string|Attribute $attribute
 	 * @return int|null
 	 */
 	public function indexOf(string|Attribute $attribute): ?int
 	{
-		if ($attribute instanceof Attribute) {
-			return $this->indexOfByInstance($attribute);
+		// superclass is provided as a string
+		if (is_string($attribute) && $attribute === Attribute::class) {
+			throw new InvalidArgumentException('Cannot check for the "Meraki\\Html\\Attribute" superclass unless passed as instance.');
 		}
 
-		return $this->indexOfByClass($attribute);
+		// attribute is provided as a subclass instance or subclass fqcn
+		if (is_subclass_of($attribute, Attribute::class)) {
+			return $this->getIndexUsingFullyQualifiedClassName($attribute instanceof Attribute ? $attribute::class : $attribute);
+		}
+
+		// attribute is provided as a string or the attribute superclass
+		return $this->getIndexByAttributeName($attribute instanceof Attribute ? $attribute->name : $attribute);
 	}
 
-	private function indexOfByInstance(Attribute $attribute): ?int
+	private function getIndexByAttributeName(string $attributeName): ?int
 	{
-		foreach ($this->attributes as $index => $existingAttribute) {
-			if ($existingAttribute->equals($attribute)) {
+		foreach ($this->attributes as $index => $attr) {
+			if ($attr->hasNameOf($attributeName)) {
 				return $index;
 			}
 		}
@@ -402,13 +399,10 @@ class Set implements \Countable, \IteratorAggregate
 		return null;
 	}
 
-	/**
-	 * @param class-string $attribute The Fully Qualified Class Name of the attribute to find.
-	 */
-	private function indexOfByClass(string $attribute): ?int
+	private function getIndexUsingFullyQualifiedClassName(string $fqcn): ?int
 	{
-		foreach ($this->attributes as $index => $existingAttribute) {
-			if ($existingAttribute instanceof $attribute) {
+		foreach ($this->attributes as $index => $attr) {
+			if ($attr::class === $fqcn) {
 				return $index;
 			}
 		}

@@ -170,7 +170,7 @@ class Element
 
 	public function __get(string $name): mixed
 	{
-		return $this->attributes->findByName($name);
+		return $this->attributes->find($name);
 	}
 
 	public function is(string $expectedTagName): bool
