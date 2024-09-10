@@ -398,18 +398,30 @@ class Set implements \Countable, \IteratorAggregate
 	 */
 	public function indexOf(string|Attribute $attribute): ?int
 	{
-		// superclass is provided as a string
-		if (is_string($attribute) && $attribute === Attribute::class) {
-			throw new InvalidArgumentException('Cannot check for the "Meraki\\Html\\Attribute" superclass unless passed as instance.');
+		$fqcn = $attribute instanceof Attribute ? $attribute::class : $attribute;
+
+		if (class_exists($fqcn)) {
+			return $this->getIndexByClassName($attribute);
 		}
 
-		// attribute is provided as a subclass instance or subclass fqcn
-		if (is_subclass_of($attribute, Attribute::class)) {
-			return $this->getIndexUsingFullyQualifiedClassName($attribute instanceof Attribute ? $attribute::class : $attribute);
+		return $this->getIndexByAttributeName($attribute);
+	}
+
+	private function getIndexByClassName(string|Attribute $attribute): ?int
+	{
+		$isInstance = $attribute instanceof Attribute;
+		$fqcn = $isInstance ? $attribute::class : $attribute;
+
+		if ($this->comparableByNameOnly($fqcn)) {
+			return $this->getIndexByAttributeName($isInstance ? $attribute->name : $attribute);
 		}
 
-		// attribute is provided as a string or the attribute superclass
-		return $this->getIndexByAttributeName($attribute instanceof Attribute ? $attribute->name : $attribute);
+		return $this->getIndexUsingFullyQualifiedClassName($fqcn);
+	}
+
+	private function comparableByNameOnly(string $fqcn): bool
+	{
+		return in_array($fqcn, [Attribute::class, Attribute\Aria::class, Attribute\Data::class], true);
 	}
 
 	private function getIndexByAttributeName(string $attributeName): ?int
