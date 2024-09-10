@@ -171,6 +171,35 @@ final class SetTest extends TestCase
 		$this->assertEquals('foo bar', $class->value);
 	}
 
+	/**
+	 * @test
+	 */
+	public function if_attribute_subclass_not_found_superclass_is_called_when_creating_attribute(): void
+	{
+		$fqcn = '\\Meraki\\Html\\Attribute\\Popover';
+		$set = new Set();
+
+		$this->assertNull($set->find($fqcn));
+
+		$popover = $set->findOrCreate($fqcn, 'popover', '');
+
+		$this->assertNotNull($popover);
+		$this->assertInstanceOf(Attribute::class, $popover);
+		$this->assertEquals('popover', $popover->name);
+		$this->assertEquals('', $popover->value);
+	}
+
+	/**
+	 * @test
+	 */
+	public function throws_error_when_cannot_create_attribute(): void
+	{
+		$exception = new \RuntimeException('Could not create factory for attribute "popover".');
+		$set = new Set();
+
+		$this->assertThrows($exception, fn() => $set->findOrCreate('popover'));
+	}
+
 	private static function globalAttributes(): array
 	{
 		return [
