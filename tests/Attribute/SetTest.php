@@ -200,6 +200,33 @@ final class SetTest extends TestCase
 		$this->assertThrows($exception, fn() => $set->findOrCreate('popover'));
 	}
 
+	/**
+	 * @test
+	 */
+	public function can_remove_an_attribute_by_superclass_instance(): void
+	{
+		$attrs = new Set();
+		$attrs->add(new Attribute('popover', ''));
+
+		$this->assertTrue($attrs->contains('popover'));
+
+		$attrs->remove(new Attribute('popover', 'foo'));
+
+		$this->assertFalse($attrs->contains('popover'));
+	}
+
+	/**
+	 * @test
+	 */
+	public function can_set_attribute_using_superclass_if_not_already_exists(): void
+	{
+		$attrs = new Set();
+
+		$attrs->set(new Attribute('popover', ''));
+
+		$this->assertTrue($attrs->contains('popover'));
+	}
+
 	private static function globalAttributes(): array
 	{
 		return [
